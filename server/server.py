@@ -18,8 +18,9 @@ class EchoServer(SocketServer.TCPServer):
         SocketServer.TCPServer.__init__(self, server_address, handler_class)
         return
 
+server = None
 try:
-    print 'Starting server on port' % ADDRESS[1]
+    print 'Starting server on port %d' % ADDRESS[1]
     server = EchoServer(ADDRESS)
     print 'Serving...'
     server.serve_forever()
@@ -28,4 +29,5 @@ except KeyboardInterrupt:
 except Exception as e:
     print 'Error:', repr(e)
 finally:
-    server.shutdown()
+    if server is not None:
+        server.shutdown()
