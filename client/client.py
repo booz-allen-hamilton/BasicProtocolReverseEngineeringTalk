@@ -1,6 +1,9 @@
 
 import socket
-import sys
+import struct
+from binascii import hexlify
+import json
+import base64
 
 ADDRESS = ('localhost', 43650)
 DEFAULT_READ_SIZE = 256
@@ -29,12 +32,16 @@ class ClientConnection(object):
             self.socket.close()
         self.socket = None
     
+    @staticmethod
+    def _decode_response(response):
+        return base64.b64decode(response)
+    
     def flush(self):
         while self.socket.recv(DEFAULT_READ_SIZE) != '':
             continue
     
     def request(self, req):
-        print 'Sending request:', repr(req)
+        print 'Sending request:', hexlify(req)
         self.socket.send(req)
         
         try:
@@ -46,11 +53,40 @@ class ClientConnection(object):
                 response += packet
             
             print 'Got response:', repr(response)
+            try:
+                response = self._decode_response(response)
+            except:
+                pass
         except Exception as e:
             print 'err:', repr(e)
         finally:
             self.flush()
         return response
- 
+
+username = 'bob'
+user_id = 0
+age = 0
+gps = None
 with ClientConnection() as client:
-    client.request('hello there')
+    packFmt = '<H%ds' % len(username)
+    request = struct.pack(packFmt, 2, username)
+    response = client.request(request)
+    d = json.loads(response)
+    user_id = d['id']
+
+if user_id > 0:
+    with ClientConnection() as client:
+        request = struct.pack('<HI', 3, user_id)
+        response = client.request(request)
+        d = json.loads(response)
+        age = d['age']
+        
+    with ClientConnection() as client:
+        request = struct.pack('<HI', 4, user_id)
+        response = client.request(request)
+        d = json.loads(response)
+        gps = d['last_gps_coords']
+print 'username:', username
+print 'user_id:', user_id
+print 'age:', age
+print 'gps:',gps
