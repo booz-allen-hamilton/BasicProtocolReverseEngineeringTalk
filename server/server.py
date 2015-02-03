@@ -20,17 +20,17 @@ commands = \
 userDb = \
 {
     'bob' : {
-        'id' : 1433,
+        'id' : 143,
         'age' : 24,
         'last_gps_coords': (14.2, 16.3),
     },
     'alice' : {
-        'id' : 1723,
+        'id' : 1223,
         'age' : 21,
         'last_gps_coords': (10.6, 22.0),
     },
     'carol' : {
-        'id' : 2106,
+        'id' : 845,
         'age' : 36,
         'last_gps_coords': (8.5, 3.1),
     },
