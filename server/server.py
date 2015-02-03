@@ -10,7 +10,7 @@ DEFAULT_READ_SIZE = 256
 
 commands = \
 {
-    2 : 'get_user_id',
+    2 : 'get_user_name',
     3 : 'get_user_age',
     4 : 'get_user_last_gps_coords',
     400 : 'dump_commands',
@@ -83,16 +83,16 @@ class UserInfoRequestHandler(SocketServer.BaseRequestHandler):
         print 'sending response:', str(response)
         self.request.send(response)
     
-    def handle_get_user_id(self, request):
-        packFmt = '<%ds' % len(request)
-        username, = struct.unpack_from(packFmt, request)
-        if userDb.has_key(username):
-            response = self._dict_to_json({'id' : userDb[username]['id']})
-            return self._encode(response)
-        return 'error: id not found'
+    def handle_get_user_name(self, request):
+        response = 'error: id not found'
+        (id, request) = self._extract_user_id_from_request(request)
+        username = self._get_username_from_id(id)
+        if username is not None:
+            response = self._encode(self._dict_to_json({'username' : username}))
+        return response
     
     def handle_get_user_age(self, request):
-        response = 'error: user not found'
+        response = 'error: id not found'
         (id, request) = self._extract_user_id_from_request(request)
         username = self._get_username_from_id(id)
         if username is not None:
@@ -103,7 +103,7 @@ class UserInfoRequestHandler(SocketServer.BaseRequestHandler):
         return response
     
     def handle_get_user_last_gps_coords(self, request):
-        response = 'error: user not found'
+        response = 'error: id not found'
         (id, request) = self._extract_user_id_from_request(request)
         username = self._get_username_from_id(id)
         if username is not None:
