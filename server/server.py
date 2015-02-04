@@ -47,7 +47,7 @@ class UserInfoRequestHandler(SocketServer.BaseRequestHandler):
     
     @staticmethod
     def _extract_user_id_from_request(request):
-        packFmt = '<I'
+        packFmt = '!I'
         try:
             id, = struct.unpack_from(packFmt, request)
         except:
@@ -69,7 +69,7 @@ class UserInfoRequestHandler(SocketServer.BaseRequestHandler):
         data = self.request.recv(DEFAULT_READ_SIZE)
         print 'request:', hexlify(data)
         
-        commandPackFmt = '<H'
+        commandPackFmt = '!H'
         command, = struct.unpack_from(commandPackFmt, data)
         
         if commands.has_key(command) is False:
